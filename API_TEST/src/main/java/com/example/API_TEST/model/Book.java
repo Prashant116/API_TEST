@@ -23,5 +23,4 @@ public class Book {
     @JoinColumn(name="author_id")
     @JsonIgnore
     private Author author;
-
 }

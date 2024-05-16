@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("book")
+@RestController
 @RequestMapping("book")
 public class AuthorBookController {
 
@@ -50,5 +50,14 @@ public class AuthorBookController {
     @DeleteMapping("/author/{authorId}")
     public String deleteAuthor(@PathVariable String authorId){
         return authorService.deleteAuthor(authorId);
+    }
+
+    @GetMapping("/paged")
+    public List<Author> findPagedAuthor(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size ,
+                                        @RequestParam(defaultValue = "name") String sortBy,
+                                        @RequestParam(defaultValue = "asc") String sortDir)
+    {
+        return authorService.getAuthorsPaged(page, size, sortBy, sortDir);
     }
 }
