@@ -13,15 +13,19 @@ import java.util.List;
 @Service
 public class BookServiceImpl implements BookService{
 
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
-    @Autowired
-    private BookRepository bookRepository;
+    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository){
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
 
-    @Autowired
-    private AuthorRepository authorRepository;
+    }
+
     @Override
     public Book createBook(BookDto bookDto) {
-        Author author = authorRepository.findById((long) bookDto.getId()).get();
+        Author author = authorRepository.findById((long) bookDto.getId())
+                .orElseThrow(() -> new RuntimeException("Author not found"));
 
         Book book = Book.builder()
                 .title(bookDto.getTitle())

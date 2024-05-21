@@ -7,10 +7,15 @@ import com.example.API_TEST.model.Book;
 import com.example.API_TEST.repository.Service.AuthorService;
 import com.example.API_TEST.repository.Service.AuthorServiceImpl;
 import com.example.API_TEST.repository.Service.BookService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("book")
@@ -30,26 +35,46 @@ public class AuthorBookController {
         return authorService.getAuthor(authorId);
     }
     @PostMapping("/author")
-    public Author createAuthor(@RequestBody AuthorDto authorDto){
-        return authorService.createAuthor(authorDto);
+    public ResponseEntity<Author> createAuthor(@RequestBody AuthorDto authorDto){
+        HttpHeaders header = new HttpHeaders();
+        header.add("Message", "Author Created");
+        return new ResponseEntity<>(authorService.createAuthor(authorDto), header, HttpStatus.CREATED);
     }
 
     @PostMapping()
-    public Book createBook(@RequestBody BookDto bookDto){
-        return bookService.createBook(bookDto);
+    public ResponseEntity<Book> createBook(@RequestBody BookDto bookDto){
+
+//        try{Book book =  bookService.createBook(bookDto);
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add("Content-header", "Created book successfully");
+//            return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(book);
+//        }
+//        catch(Exception e){
+//            System.out.println("Error "+e.getMessage());
+////            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Author Not Found");
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+        try{
+            Book book = bookService.createBook(bookDto);
+            return new ResponseEntity<>(book, HttpStatus.CREATED);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(new Book(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @GetMapping("/bookBy/{authorId}")
-    public List<Book> findByAuthor(@PathVariable String authorId){
+    public ResponseEntity<List<Book>> findByAuthor(@PathVariable String authorId){
         Author author = authorService.getAuthor(authorId);
-        return bookService.getBooksByAuthor(author);
+        return new ResponseEntity<>(bookService.getBooksByAuthor(author), HttpStatus.OK);
     }
 
 
     //Deleting an author delete the corresponding books as well
     @DeleteMapping("/author/{authorId}")
-    public String deleteAuthor(@PathVariable String authorId){
-        return authorService.deleteAuthor(authorId);
+    public ResponseEntity<String> deleteAuthor(@PathVariable String authorId){
+        return new ResponseEntity<>(authorService.deleteAuthor(authorId), HttpStatus.OK);
     }
 
     @GetMapping("/paged")
